@@ -146,6 +146,7 @@ def have_competing_needs(a1, a2, mutex_props):
     Hint: for propositions p  and q, the command  "Pair(p, q) in mutex_props"
           returns true if p and q are mutex in the previous level
     """
+    # todo: choose option
     return any(Pair(p, q) in mutex_props for p, q in np.product(a1.get_pre, a2.get_pre))
 
 
