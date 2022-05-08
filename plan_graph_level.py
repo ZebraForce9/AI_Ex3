@@ -79,7 +79,9 @@ class PlanGraphLevel(object):
         Note that an action is *not* mutex with itself
         """
         current_layer_actions = self.action_layer.get_actions()
-        "*** YOUR CODE HERE ***"
+        for a1, a2 in np.prod(current_layer_actions, current_layer_actions):
+            if mutex_actions(a1, a2, previous_layer_mutex_proposition):
+                self.action_layer.add_mutex_actions(a1, a2)
 
     def update_proposition_layer(self):
         """
