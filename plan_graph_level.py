@@ -1,3 +1,5 @@
+from collections import Set
+
 from action_layer import ActionLayer
 from util import Pair
 from proposition import Proposition
@@ -45,7 +47,7 @@ class PlanGraphLevel(object):
     def set_action_layer(self, action_layer):  # sets the action layer
         self.action_layer = action_layer
 
-    def update_action_layer(self, previous_proposition_layer):
+    def update_action_layer(self, previous_proposition_layer: PropositionLayer):
         """
         Updates the action layer given the previous proposition layer (see proposition_layer.py)
         You should add an action to the layer if its preconditions are in the previous propositions layer,
@@ -59,7 +61,12 @@ class PlanGraphLevel(object):
         self.actionLayer.addAction(action) adds action to the current action layer
         """
         all_actions = PlanGraphLevel.actions
-        "*** YOUR CODE HERE ***"
+        for action in all_actions:
+            if not previous_proposition_layer.all_preconds_in_layer(action):
+                continue
+            if all(not previous_proposition_layer.is_mutex(p, q) for p, q in
+                   np.prod(action.get_pre(), action.get_pre())):
+                self.action_layer.add_action(action)
 
     def update_mutex_actions(self, previous_layer_mutex_proposition):
         """
@@ -139,7 +146,7 @@ def mutex_actions(a1, a2, mutex_props):
     return have_competing_needs(a1, a2, mutex_props)
 
 
-def have_competing_needs(a1, a2, mutex_props):
+def have_competing_needs(a1, a2, mutex_props: Set[Pair]):
     """
     Complete code for deciding whether actions a1 and a2 have competing needs,
     given the mutex proposition from previous level (list of pairs of propositions).
@@ -148,6 +155,7 @@ def have_competing_needs(a1, a2, mutex_props):
     """
     # todo: choose option
     return any(Pair(p, q) in mutex_props for p, q in np.product(a1.get_pre, a2.get_pre))
+    # return any(Pair(p, q) == pair for pair in mutex_props for p, q in np.product(a1.get_pre, a2.get_pre))
 
 
 def mutex_propositions(prop1, prop2, mutex_actions_list):
@@ -158,4 +166,5 @@ def mutex_propositions(prop1, prop2, mutex_actions_list):
     You might want to use this function:
     prop1.get_producers() returns the set of all the possible actions in the layer that have prop1 on their add list
     """
-    "*** YOUR CODE HERE ***"
+    # todo: add the 1st condition
+    return all(Pair(p, q) in mutex_actions_list for p, q in np.product(prop1.get_producers(), prop2.get_producers()))
