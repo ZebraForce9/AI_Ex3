@@ -223,7 +223,7 @@ class GraphPlan(object):
 
 def independent_pair(a1, a2):
     """
-    Returns true if the actions are neither have inconsistent effects
+    Returns true if the actions neither have inconsistent effects
     nor they interfere one with the other.
     You might want to use those functions:
     a1.get_pre() returns the pre list of a1
