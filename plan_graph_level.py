@@ -103,7 +103,24 @@ class PlanGraphLevel(object):
 
         """
         current_layer_actions = self.action_layer.get_actions()
-        "*** YOUR CODE HERE ***"
+        # to_be_removed = set()
+        to_be_added = set()
+        producers_dict = {}
+
+        for action in current_layer_actions:
+            # to_be_removed |= set(action.get_delete())
+            to_be_added |= {Proposition(prop.get_name()) for prop in action.get_add()}
+            for prop in to_be_added:
+                if prop in producers_dict:
+                    producers_dict[prop].append(action)
+                else:
+                    producers_dict[prop] = [action]
+
+        for prop, producers in producers_dict.items():
+            prop.set_producers(list(producers))
+
+        # self.proposition_layer.propositions -= to_be_removed
+        self.proposition_layer.propositions |= to_be_added
 
     def update_mutex_proposition(self):
         """
