@@ -1,3 +1,5 @@
+import itertools
+
 from util import Pair
 from proposition_layer import PropositionLayer
 from plan_graph_level import PlanGraphLevel

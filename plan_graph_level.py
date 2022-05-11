@@ -95,7 +95,6 @@ class PlanGraphLevel(object):
         dict() creates a new dictionary that might help to keep track on the propositions that you've
                already added to the layer
         self.proposition_layer.add_proposition(prop) adds the proposition prop to the current layer
-
         """
         current_layer_actions = self.action_layer.get_actions()
         props = dict()  # Prop_Name: Prop
@@ -157,9 +156,17 @@ class PlanGraphLevel(object):
         previous_layer_mutex_proposition = previous_proposition_layer.get_mutex_props()
 
         self.update_action_layer(previous_proposition_layer)
+        test = sorted([action.name for action in self.action_layer.get_actions()])
+        print(len(test), test)
         self.update_mutex_actions(previous_layer_mutex_proposition)
+        test = sorted([list((pair.a.name, pair.b.name)) for pair in self.action_layer.get_mutex_actions()])
+        print(len(test), test)
         self.update_proposition_layer()
+        test = sorted([p.name for p in self.proposition_layer.get_propositions()])
+        print(len(test), test)
         self.update_mutex_proposition()
+        test = sorted([list((pair.a.name, pair.b.name)) for pair in self.proposition_layer.get_mutex_props()])
+        print(len(test), test, "\n")
 
     def expand_without_mutex(self, previous_layer):
         """
@@ -209,4 +216,22 @@ def mutex_propositions(prop1, prop2, mutex_actions_list):
     # if prop1 == prop2:
     #     return False
     # todo: add the 1st condition
-    return all(Pair(p, q) in mutex_actions_list for p, q in product(prop1.get_producers(), prop2.get_producers()))
+    # a, b = prop1.get_producers(), prop2.get_producers()
+    # for p, q in unique_product(a, b):
+    #     if p == q:
+    #         continue
+    #     k = Pair(p, q)
+    #     if k not in mutex_actions_list:
+    #         return False
+    # return True
+    return all(
+        Pair(p, q) in mutex_actions_list for p, q in unique_product(prop1.get_producers(), prop2.get_producers()))
+
+
+def unique_product(iter1, iter2):
+    res = []
+    for a in iter1:
+        for b in iter2:
+            if a != b:
+                res.append((a, b))
+    return res
