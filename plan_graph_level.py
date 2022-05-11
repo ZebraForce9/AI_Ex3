@@ -4,7 +4,7 @@ from action_layer import ActionLayer
 from util import Pair
 from proposition import Proposition
 from proposition_layer import PropositionLayer
-from itertools import product, combinations
+from itertools import combinations
 
 
 class PlanGraphLevel(object):
@@ -65,7 +65,7 @@ class PlanGraphLevel(object):
             if not previous_proposition_layer.all_preconds_in_layer(action):
                 continue
             if all(not previous_proposition_layer.is_mutex(p, q) for p, q in
-                   product(action.get_pre(), action.get_pre())):
+                   unique_product(action.get_pre(), action.get_pre())):
                 self.action_layer.add_action(action)
 
     def update_mutex_actions(self, previous_layer_mutex_proposition):
@@ -79,7 +79,7 @@ class PlanGraphLevel(object):
         Note that an action is *not* mutex with itself
         """
         current_layer_actions = self.action_layer.get_actions()
-        for a1, a2 in combinations(current_layer_actions, r=2):
+        for a1, a2 in unique_product(current_layer_actions, current_layer_actions):
             if mutex_actions(a1, a2, previous_layer_mutex_proposition):
                 self.action_layer.add_mutex_actions(a1, a2)
 
@@ -98,21 +98,36 @@ class PlanGraphLevel(object):
 
         """
         current_layer_actions = self.action_layer.get_actions()
-        to_be_added = set()
-        producers_dict = {}
-
+        props = dict()  # Prop_Name: Prop
         for action in current_layer_actions:
-            to_be_added |= {Proposition(prop.get_name()) for prop in action.get_add()}
-            for prop in to_be_added:
-                if prop in producers_dict:
-                    producers_dict[prop].append(action)
-                else:
-                    producers_dict[prop] = [action]
+            for prop in action.get_add():
+                name = prop.get_name()
+                if name not in props:
+                    props[name] = Proposition(name)
 
-        for prop, producers in producers_dict.items():
-            prop.set_producers(list(producers))
+                props[name].add_producer(action)
 
-        self.proposition_layer.propositions |= to_be_added
+        for prop in props.values():
+            self.proposition_layer.add_proposition(prop)
+
+        # current_layer_actions = self.action_layer.get_actions()
+        # to_be_added = set()
+        # producers_dict = {}
+        #
+        # for action in current_layer_actions:
+        #     to_add = {Proposition(prop.get_name()) for prop in action.get_add()}
+        #     to_be_added |= to_add
+        #     for prop in to_add:
+        #         if prop in producers_dict:
+        #             producers_dict[prop].add(action)
+        #         else:
+        #             producers_dict[prop] = {action}
+        #
+        # for prop, producers in producers_dict.items():
+        #     prop.set_producers(list(producers))
+        #
+        # self.proposition_layer.propositions |= set(producers_dict.keys())
+        # # self.proposition_layer.propositions |= to_be_added
 
     def update_mutex_proposition(self):
         """
@@ -125,7 +140,7 @@ class PlanGraphLevel(object):
         """
         current_layer_propositions = self.proposition_layer.get_propositions()
         current_layer_mutex_actions = self.action_layer.get_mutex_actions()
-        for p, q in product(current_layer_propositions, current_layer_propositions):
+        for p, q in unique_product(current_layer_propositions, current_layer_propositions):
             if mutex_propositions(p, q, current_layer_mutex_actions):
                 self.proposition_layer.add_mutex_prop(p, q)
 
@@ -162,8 +177,8 @@ def mutex_actions(a1, a2, mutex_props):
     this is the list of all the independent pair of actions (according to your implementation in question 1).
     If not, we check whether a1 and a2 have competing needs
     """
-    if a1 == a2:  # an action is *not* mutex with itself
-        return False
+    # if a1 == a2:  # an action is *not* mutex with itself
+    #     return False
 
     if Pair(a1, a2) not in PlanGraphLevel.independent_actions:
         return True
@@ -178,9 +193,9 @@ def have_competing_needs(a1, a2, mutex_props: Set[Pair]):
     Hint: for propositions p  and q, the command  "Pair(p, q) in mutex_props"
           returns true if p and q are mutex in the previous level
     """
-    return any(Pair(p, q) in mutex_props for p, q in product(a1.get_pre(), a2.get_pre()))
+    return any(Pair(p, q) in mutex_props for p, q in unique_product(a1.get_pre(), a2.get_pre()))
     # todo: choose option
-    # return any(Pair(p, q) == pair for pair in mutex_props for p, q in product(a1.get_pre, a2.get_pre))
+    # return any(Pair(p, q) == pair for pair in mutex_props for p, q in unique_product(a1.get_pre, a2.get_pre))
 
 
 def mutex_propositions(prop1, prop2, mutex_actions_list):
@@ -191,5 +206,7 @@ def mutex_propositions(prop1, prop2, mutex_actions_list):
     You might want to use this function:
     prop1.get_producers() returns the set of all the possible actions in the layer that have prop1 on their add list
     """
+    # if prop1 == prop2:
+    #     return False
     # todo: add the 1st condition
     return all(Pair(p, q) in mutex_actions_list for p, q in product(prop1.get_producers(), prop2.get_producers()))
