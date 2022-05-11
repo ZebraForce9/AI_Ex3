@@ -153,7 +153,6 @@ class PlanGraphLevel(object):
         self.update_mutex_actions(previous_layer_mutex_proposition)
         self.update_proposition_layer()
         self.update_mutex_proposition()
-        x = 5
 
     def expand_without_mutex(self, previous_layer):
         """
@@ -171,8 +170,12 @@ def mutex_actions(a1, a2, mutex_props):
     this is the list of all the independent pair of actions (according to your implementation in question 1).
     If not, we check whether a1 and a2 have competing needs
     """
+    if a1 == a2: # Note that an action is *not* mutex with itself
+        return False
+
     if Pair(a1, a2) not in PlanGraphLevel.independent_actions:
         return True
+
     return have_competing_needs(a1, a2, mutex_props)
 
 

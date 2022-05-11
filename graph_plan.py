@@ -261,3 +261,14 @@ if __name__ == '__main__':
         print("Plan found with %d actions in %.2f seconds" % (len([act for act in plan if not act.is_noop()]), elapsed))
     else:
         print("Could not find a plan in %.2f seconds" % elapsed)
+    print(sorted([action.name for action in plan]))
+    print(sorted([action.name for action in plan if action.noOp is False]))
+
+# ['r1', 'Lar1', 'q2', 'Lbq2', 'Mr12', 'ar', 'Mq21', 'bq', 'Uar2', 'Ubq1']
+# ['Lar1', 'Lbq2', 'Mr12', 'Mq21', 'Uar2', 'Ubq1']
+
+# ['Mq21', 'uq', 'a1', 'Mr12', 'ur', 'b2', 'q1', 'Laq1', 'r2', 'Lbr2', 'Mq12', 'aq', 'Mr21', 'br', 'Uaq2', 'Ubr1']
+# ['Mq21', 'Mr12', 'Laq1', 'Lbr2', 'Mq12', 'Mr21', 'Uaq2', 'Ubr1']
+
+# ['r1', 'Lar1', 'Mq21', 'uq', 'b2', 'Mr12', 'ar', 'Mq12', 'uq', 'b2', 'Uar2', 'q2', 'Lbq2', 'a2', 'Mq21', 'bq', 'a2', 'Ubq1']
+# ['Lar1', 'Mq21', 'Mr12', 'Mq12', 'Uar2', 'Lbq2', 'Mq21', 'Ubq1']
