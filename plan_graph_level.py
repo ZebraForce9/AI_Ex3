@@ -4,7 +4,7 @@ from action_layer import ActionLayer
 from util import Pair
 from proposition import Proposition
 from proposition_layer import PropositionLayer
-from itertools import product
+from itertools import product, combinations
 
 
 class PlanGraphLevel(object):
@@ -84,7 +84,8 @@ class PlanGraphLevel(object):
         Note that an action is *not* mutex with itself
         """
         current_layer_actions = self.action_layer.get_actions()
-        for a1, a2 in product(current_layer_actions, current_layer_actions):
+        # for a1, a2 in product(current_layer_actions, current_layer_actions):
+        for a1, a2 in combinations(current_layer_actions, r=2):
             if mutex_actions(a1, a2, previous_layer_mutex_proposition):
                 self.action_layer.add_mutex_actions(a1, a2)
 
@@ -188,6 +189,8 @@ def have_competing_needs(a1, a2, mutex_props: Set[Pair]):
     """
     # todo: choose option
     return any(Pair(p, q) in mutex_props for p, q in product(a1.get_pre(), a2.get_pre()))
+
+    # return any(Pair(p, q) in mutex_props for p, q in product(a1.get_pre(), a2.get_pre()))
     # return any(Pair(p, q) == pair for pair in mutex_props for p, q in product(a1.get_pre, a2.get_pre))
 
 
