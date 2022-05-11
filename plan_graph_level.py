@@ -183,8 +183,6 @@ def have_competing_needs(a1, a2, mutex_props: Set[Pair]):
           returns true if p and q are mutex in the previous level
     """
     # todo: choose option
-    return any(Pair(p, q) in mutex_props for p, q in product(a1.get_pre(), a2.get_pre()))
-
     # return any(Pair(p, q) == pair for pair in mutex_props for p, q in product(a1.get_pre, a2.get_pre))
 
 
