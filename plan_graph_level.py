@@ -1,3 +1,4 @@
+from _ast import List
 from typing import Set
 
 from action_layer import ActionLayer
@@ -47,7 +48,7 @@ class PlanGraphLevel(object):
     def set_action_layer(self, action_layer):  # sets the action layer
         self.action_layer = action_layer
 
-    def update_action_layer(self, previous_proposition_layer: PropositionLayer):
+    def update_action_layer(self, previous_proposition_layer: PropositionLayer) -> None:
         """
         Updates the action layer given the previous proposition layer (see proposition_layer.py)
         You should add an action to the layer if its preconditions are in the previous propositions layer,
@@ -68,7 +69,7 @@ class PlanGraphLevel(object):
             if all(not previous_proposition_layer.is_mutex(p, q) for p, q in precondition_pairs):
                 self.action_layer.add_action(action)
 
-    def update_mutex_actions(self, previous_layer_mutex_proposition):
+    def update_mutex_actions(self, previous_layer_mutex_proposition: Set[Pair]) -> None:
         """
         Updates the mutex set in self.action_layer,
         given the mutex proposition from the previous layer.
@@ -104,7 +105,6 @@ class PlanGraphLevel(object):
                 name = prop.get_name()
                 if name not in props:
                     props[name] = Proposition(name)
-
                 props[name].add_producer(action)
 
         for prop in props.values():
@@ -121,7 +121,8 @@ class PlanGraphLevel(object):
         """
         current_layer_propositions = self.proposition_layer.get_propositions()
         current_layer_mutex_actions = self.action_layer.get_mutex_actions()
-        for p, q in unique_product(current_layer_propositions, current_layer_propositions):
+        proposition_pairs = unique_product(current_layer_propositions, current_layer_propositions)
+        for p, q in proposition_pairs:
             if mutex_propositions(p, q, current_layer_mutex_actions):
                 self.proposition_layer.add_mutex_prop(p, q)
 
@@ -138,17 +139,17 @@ class PlanGraphLevel(object):
         previous_layer_mutex_proposition = previous_proposition_layer.get_mutex_props()
 
         self.update_action_layer(previous_proposition_layer)
-        test = sorted([action.name for action in self.action_layer.get_actions()])
-        print(len(test), test)
+        # test = sorted([action.name for action in self.action_layer.get_actions()])
+        # print(len(test), test)
         self.update_mutex_actions(previous_layer_mutex_proposition)
-        test = sorted([list((pair.a.name, pair.b.name)) for pair in self.action_layer.get_mutex_actions()])
-        print(len(test), test)
+        # test = sorted([list((pair.a.name, pair.b.name)) for pair in self.action_layer.get_mutex_actions()])
+        # print(len(test), test)
         self.update_proposition_layer()
-        test = sorted([p.name for p in self.proposition_layer.get_propositions()])
-        print(len(test), test)
+        # test = sorted([p.name for p in self.proposition_layer.get_propositions()])
+        # print(len(test), test)
         self.update_mutex_proposition()
-        test = sorted([list((pair.a.name, pair.b.name)) for pair in self.proposition_layer.get_mutex_props()])
-        print(len(test), test, "\n")
+        # test = sorted([list((pair.a.name, pair.b.name)) for pair in self.proposition_layer.get_mutex_props()])
+        # print(len(test), test, "\n")
 
     def expand_without_mutex(self, previous_layer):
         """
