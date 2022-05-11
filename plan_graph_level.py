@@ -62,10 +62,6 @@ class PlanGraphLevel(object):
         """
         all_actions = PlanGraphLevel.actions
         for action in all_actions:
-            # cond1 = previous_proposition_layer.all_preconds_in_layer(action)
-            # cond2 = all(not previous_proposition_layer.is_mutex(p, q) for p, q in product(action.get_pre(), action.get_pre()))
-            # if cond1 and cond2:
-            #     self.action_layer.add_action(action)
             if not previous_proposition_layer.all_preconds_in_layer(action):
                 continue
             if all(not previous_proposition_layer.is_mutex(p, q) for p, q in
@@ -182,6 +178,7 @@ def have_competing_needs(a1, a2, mutex_props: Set[Pair]):
     Hint: for propositions p  and q, the command  "Pair(p, q) in mutex_props"
           returns true if p and q are mutex in the previous level
     """
+    return any(Pair(p, q) in mutex_props for p, q in product(a1.get_pre(), a2.get_pre()))
     # todo: choose option
     # return any(Pair(p, q) == pair for pair in mutex_props for p, q in product(a1.get_pre, a2.get_pre))
 
