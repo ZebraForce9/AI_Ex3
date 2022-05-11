@@ -60,7 +60,6 @@ class PlanGraphLevel(object):
         if all the preconditions of action are in the previous propositions layer
         self.actionLayer.addAction(action) adds action to the current action layer
         """
-        # todo: should we clear the action layer before?
         all_actions = PlanGraphLevel.actions
         for action in all_actions:
             # cond1 = previous_proposition_layer.all_preconds_in_layer(action)
@@ -84,7 +83,6 @@ class PlanGraphLevel(object):
         Note that an action is *not* mutex with itself
         """
         current_layer_actions = self.action_layer.get_actions()
-        # for a1, a2 in product(current_layer_actions, current_layer_actions):
         for a1, a2 in combinations(current_layer_actions, r=2):
             if mutex_actions(a1, a2, previous_layer_mutex_proposition):
                 self.action_layer.add_mutex_actions(a1, a2)
@@ -104,12 +102,10 @@ class PlanGraphLevel(object):
 
         """
         current_layer_actions = self.action_layer.get_actions()
-        # to_be_removed = set()
         to_be_added = set()
         producers_dict = {}
 
         for action in current_layer_actions:
-            # to_be_removed |= set(action.get_delete())
             to_be_added |= {Proposition(prop.get_name()) for prop in action.get_add()}
             for prop in to_be_added:
                 if prop in producers_dict:
@@ -120,7 +116,6 @@ class PlanGraphLevel(object):
         for prop, producers in producers_dict.items():
             prop.set_producers(list(producers))
 
-        # self.proposition_layer.propositions -= to_be_removed
         self.proposition_layer.propositions |= to_be_added
 
     def update_mutex_proposition(self):
@@ -190,7 +185,6 @@ def have_competing_needs(a1, a2, mutex_props: Set[Pair]):
     # todo: choose option
     return any(Pair(p, q) in mutex_props for p, q in product(a1.get_pre(), a2.get_pre()))
 
-    # return any(Pair(p, q) in mutex_props for p, q in product(a1.get_pre(), a2.get_pre()))
     # return any(Pair(p, q) == pair for pair in mutex_props for p, q in product(a1.get_pre, a2.get_pre))
 
 
@@ -203,8 +197,4 @@ def mutex_propositions(prop1, prop2, mutex_actions_list):
     prop1.get_producers() returns the set of all the possible actions in the layer that have prop1 on their add list
     """
     # todo: add the 1st condition
-    # for p, q in product(prop1.get_producers(), prop2.get_producers()):
-    #     if Pair(p, q) not in mutex_actions_list:
-    #         return False
-    # return True
     return all(Pair(p, q) in mutex_actions_list for p, q in product(prop1.get_producers(), prop2.get_producers()))
