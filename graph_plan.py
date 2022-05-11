@@ -223,7 +223,7 @@ class GraphPlan(object):
         return True
 
 
-def independent_pair(a1, a2):
+def independent_pair(a1: Action, a2: Action) -> bool:
     """
     Returns true if the actions neither have inconsistent effects
     nor they interfere one with the other.
