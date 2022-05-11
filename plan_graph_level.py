@@ -170,7 +170,7 @@ def mutex_actions(a1, a2, mutex_props):
     this is the list of all the independent pair of actions (according to your implementation in question 1).
     If not, we check whether a1 and a2 have competing needs
     """
-    if a1 == a2: # Note that an action is *not* mutex with itself
+    if a1 == a2:  # an action is *not* mutex with itself
         return False
 
     if Pair(a1, a2) not in PlanGraphLevel.independent_actions:
