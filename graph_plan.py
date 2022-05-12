@@ -73,8 +73,20 @@ class GraphPlan(object):
             pg_next.expand(
                 self.graph[level - 1])  # calls the expand function, which you are implementing in the PlanGraph class
             self.graph.append(pg_next)  # appending the new level to the plan graph
+            # print(sorted([action.name for action in pg_next.action_layer.get_actions()]))
+            # print(sorted(sorted([(pair.a.name, pair.b.name) for pair in pg_next.action_layer.get_mutex_actions()])))
+            # print(sorted(sorted([p.name for p in pg_next.proposition_layer.get_propositions()])))
+            # print(sorted(sorted([(pair.a.name, pair.b.name) for pair in pg_next.proposition_layer.get_mutex_props()])))
+            # print()
 
             size_no_good = len(self.no_goods[level])  # remember size of nogood table
+
+        # for pg_next in self.graph:
+        # print(sorted([(pair.a.name, pair.b.name) for pair in pg_next.independent_actions]))
+        # print(sorted([(pair.a.name, pair.b.name) for pair in pg_next.action_layer.get_mutex_actions()]))
+        # print(sorted([p.name for p in pg_next.proposition_layer.get_propositions()]))
+        # print(sorted([(pair.a.name, pair.b.name) for pair in pg_next.proposition_layer.get_mutex_props()]))
+        # print()
 
         plan_solution = self.extract(self.graph, self.goal, level)
         # try to extract a plan since all of the goal propositions are in current graph level, and are not mutex
@@ -105,6 +117,7 @@ class GraphPlan(object):
             return None
         plan_solution = self.gp_search(graph, sub_goals, [], level)
         if plan_solution is not None:
+            # print("WAA:", [action.name for action in plan_solution])
             return plan_solution
         self.no_goods[level].append([sub_goals])
         return None
@@ -263,5 +276,5 @@ if __name__ == '__main__':
         print("Plan found with %d actions in %.2f seconds" % (len([act for act in plan if not act.is_noop()]), elapsed))
     else:
         print("Could not find a plan in %.2f seconds" % elapsed)
-    print(sorted([action.name for action in plan]))
-    print(sorted([action.name for action in plan if action.noOp is False]))
+    print([action.name for action in plan])
+    # print(sorted([action.name for action in plan if action.noOp is False]))
