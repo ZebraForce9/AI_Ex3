@@ -2,18 +2,21 @@ from graph_plan import GraphPlan
 from plan_graph_level import PlanGraphLevel, unique_product
 from pgparser import PgParser
 from action import Action
+from proposition import Proposition
+from typing import FrozenSet, List, Tuple
 
 try:
-    from search import SearchProblem
-    from search import a_star_search
+    from CPF.search import SearchProblem
+    from CPF.search import a_star_search
 
 except:
-    try:
-        from CPF.search import SearchProblem
-        from CPF.search import a_star_search
-    except:
-        from CPF.search_win_34 import SearchProblem
-        from CPF.search_win_34 import a_star_search
+    # try:
+    from CPF.search import SearchProblem
+    from CPF.search import a_star_search
+# except:
+#     from CPF.search_win_34 import SearchProblem
+#     from CPF.search_win_34 import a_star_search
+from proposition_layer import PropositionLayer
 
 
 class PlanningProblem:
@@ -41,13 +44,13 @@ class PlanningProblem:
     def get_start_state(self) -> FrozenSet[Proposition]:
         return self.initialState
 
-    def is_goal_state(self, state):
+    def is_goal_state(self, state: FrozenSet[Proposition]) -> bool:
         """
         Hint: you might want to take a look at goal_state_not_in_prop_layer function
         """
-        "*** YOUR CODE HERE ***"
+        return not self.goal_state_not_in_prop_layer(state)  # todo: validate
 
-    def get_successors(self, state):
+    def get_successors(self, state: FrozenSet[Proposition]) -> List[Tuple[FrozenSet[Proposition], Action, int]]:
         """
         For a given state, this should return a list of triples,
         (successor, action, step_cost), where 'successor' is a
@@ -61,7 +64,32 @@ class PlanningProblem:
         Note that a state *must* be hashable!! Therefore, you might want to represent a state as a frozenset
         """
         self.expanded += 1
-        "*** YOUR CODE HERE ***"
+        step_cost = 1
+        # todo: expected (allegedly): 49, we got 48
+        successors = []
+        for action in self.actions:
+            if action.all_preconds_in_list(state) and not action.is_noop():  # todo: validate noop
+                successor = frozenset(action.get_add() + [prop for prop in state if prop not in action.get_delete()])
+                successors.append((successor, action, step_cost))
+                # proposition_pairs = unique_product(action.get_pre(), action.get_pre())
+                # if all(not state.is_mutex(p, q) for p, q in proposition_pairs):
+                #     self.action_layer.add_action(action)
+
+        return successors
+
+        # current_level = PlanGraphLevel()
+        # current_prop_layer = PropositionLayer()
+        # for p in state:
+        #     current_prop_layer.add_proposition(p)
+        # current_level.update_action_layer(current_prop_layer)
+        # successors = []
+        # # todo: can noOp be in an optimal plan?
+        # #  also, do we *have* to use PlanGraphLevel?
+        # for action in current_level.get_action_layer().get_actions():
+        #     successor = frozenset(action.get_add() + [prop for prop in state if prop not in action.get_delete()])
+        #     successors.append((successor, action, step_cost))
+        #
+        # return successors
 
     @staticmethod
     def get_cost_of_actions(actions):
@@ -92,19 +120,28 @@ class PlanningProblem:
             self.actions.append(act)
 
 
-def max_level(state, planning_problem):
+def max_level(state: FrozenSet[Proposition], planning_problem: PlanningProblem) -> float:
     """
     The heuristic value is the number of layers required to expand all goal propositions.
     If the goal is not reachable from the state your heuristic should return float('inf')
     A good place to start would be:
-    prop_layer_init = PropositionLayer()          #create a new proposition layer
-    for prop in state:
-        prop_layer_init.add_proposition(prop)        #update the proposition layer with the propositions of the state
-    pg_init = PlanGraphLevel()                   #create a new plan graph level (level is the action layer and the propositions layer)
-    pg_init.set_proposition_layer(prop_layer_init)   #update the new plan graph level with the the proposition layer
     """
-    "*** YOUR CODE HERE ***"
-
+    prop_layer_init = PropositionLayer()  # create a new proposition layer
+    for prop in state:
+        prop_layer_init.add_proposition(prop)  # update the proposition layer with the propositions of the state
+    pg_init = PlanGraphLevel()  # create a new plan graph level (level is the action layer and the propositions layer)
+    pg_init.set_proposition_layer(prop_layer_init)  # update the new plan graph level with the the proposition layer`
+    # todo: expected (allegedly): 29, we got 23 (although consistently)
+    level = 0
+    graph: List[PlanGraphLevel] = [pg_init]
+    while not planning_problem.is_goal_state(state):
+        if is_fixed(graph, level):
+            return float('inf')
+        level += 1
+        pg_next = PlanGraphLevel()
+        pg_next.expand_without_mutex(graph[level - 1])
+        graph.append(pg_next)
+    return level
 
 
 def level_sum(state, planning_problem):

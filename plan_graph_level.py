@@ -65,8 +65,8 @@ class PlanGraphLevel(object):
         for action in all_actions:
             if not previous_proposition_layer.all_preconds_in_layer(action):
                 continue
-            precondition_pairs = unique_product(action.get_pre(), action.get_pre())
-            if all(not previous_proposition_layer.is_mutex(p, q) for p, q in precondition_pairs):
+            proposition_pairs = unique_product(action.get_pre(), action.get_pre())
+            if all(not previous_proposition_layer.is_mutex(p, q) for p, q in proposition_pairs):
                 self.action_layer.add_action(action)
 
     def update_mutex_actions(self, previous_layer_mutex_proposition: Set[Pair]) -> None:
@@ -157,7 +157,7 @@ class PlanGraphLevel(object):
         # test = sorted([list((pair.a.name, pair.b.name)) for pair in self.proposition_layer.get_mutex_props()])
         # print(len(test))
 
-    def expand_without_mutex(self, previous_layer):
+    def expand_without_mutex(self, previous_layer) -> None:
         """
         Questions 11 and 12
         You don't have to use this function
