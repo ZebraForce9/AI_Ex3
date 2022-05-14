@@ -9,13 +9,12 @@ try:
     from CPF.search import SearchProblem
     from CPF.search import a_star_search
 
-except:
-    # try:
-    from CPF.search import SearchProblem
-    from CPF.search import a_star_search
 # except:
-#     from CPF.search_win_34 import SearchProblem
-#     from CPF.search_win_34 import a_star_search
+#     from CPF.search import SearchProblem
+#     from CPF.search import a_star_search
+except:
+    from CPF.search_win_34 import SearchProblem
+    from CPF.search_win_34 import a_star_search
 from proposition_layer import PropositionLayer
 
 
