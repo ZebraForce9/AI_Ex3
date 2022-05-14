@@ -9,15 +9,16 @@ def create_domain_file(domain_file_name, n_, m_):
     for p in pegs:
         domain_file.write(f"CLEAR({p}) ")
         for d in disks:
-            domain_file.write(f"SMALLER({d}, {p}) ")
-            domain_file.write(f"ON({d}, {p}) ")
+            domain_file.write(f"SMALLER({d}-{p}) ")
+            domain_file.write(f"ON({d}-{p}) ")
 
     for d in disks:
         domain_file.write(f"CLEAR({d}) ")
 
-    for i in range(1, len(disks)):
-        domain_file.write(f"SMALLER({disks[i - 1]}, {disks[i]}) ")
-        domain_file.write(f"ON({disks[i - 1]}, {disks[i]}) ")
+    for i in range(len(disks)):
+        for j in range(i + 1, len(disks)):
+            domain_file.write(f"SMALLER({disks[i]}-{disks[j]}) ")  # disk i is smaller than all the j disks under him
+            domain_file.write(f"ON({disks[i]}-{disks[j]}) ")
 
     domain_file.write(f"\n")
 
@@ -26,10 +27,10 @@ def create_domain_file(domain_file_name, n_, m_):
             for b in disks + pegs:
                 if (a[0] == "d" and d >= a) or (b[0] == "d" and d >= b) or (a == b):
                     continue
-                domain_file.write(f"Name: Move({d}, {a}, {b})\n")
-                domain_file.write(f"Pre: CLEAR({d}) ON({d}, {a}) CLEAR({b}) SMALLER({a}, {b})\n")
-                domain_file.write(f"Add: CLEAR({a}) ON({d},{b})\n")
-                domain_file.write(f"Del: ON({d}, {a}) CLEAR({b})\n")
+                domain_file.write(f"Name: Move({d}-{a}-{b})\n")
+                domain_file.write(f"Pre: CLEAR({d}) ON({d}-{a}) CLEAR({b}) SMALLER({d}-{b})\n")
+                domain_file.write(f"Add: CLEAR({a}) ON({d}-{b})\n")
+                domain_file.write(f"Del: ON({d}-{a}) CLEAR({b})\n")
                 # domain_file.write("\n")  # TODO: REMOVE
 
     domain_file.close()
@@ -47,11 +48,14 @@ def create_problem_file(problem_file_name_, n_, m_):
         problem_file.write(f"CLEAR({pegs[i]}) ")
 
     problem_file.write(f"CLEAR({disks[0]}) ")
-    problem_file.write(f"ON({disks[-1]}, {pegs[0]}) ")
+    problem_file.write(f"ON({disks[-1]}-{pegs[0]}) ")
 
     for i in range(1, len(disks)):
-        problem_file.write(f"ON({disks[i - 1]}, {disks[i]}) ")
-        problem_file.write(f"SMALLER({disks[i - 1]}, {disks[i]}) ")
+        problem_file.write(f"ON({disks[i - 1]}-{disks[i]}) ")
+
+    for i in range(len(disks)):
+        for j in range(i + 1, len(disks)):
+            problem_file.write(f"SMALLER({disks[i]}-{disks[j]}) ")
 
     for d in disks:
         for p in pegs:

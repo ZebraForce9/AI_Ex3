@@ -9,12 +9,12 @@ try:
     from CPF.search import SearchProblem
     from CPF.search import a_star_search
 
-# except:
-#     from CPF.search import SearchProblem
-#     from CPF.search import a_star_search
 except:
-    from CPF.search_win_34 import SearchProblem
-    from CPF.search_win_34 import a_star_search
+    from CPF.search import SearchProblem
+    from CPF.search import a_star_search
+# except:
+#     from CPF.search_win_34 import SearchProblem
+#     from CPF.search_win_34 import a_star_search
 from proposition_layer import PropositionLayer
 
 
@@ -64,7 +64,6 @@ class PlanningProblem:
         """
         self.expanded += 1
         step_cost = 1
-        # todo: expected (allegedly): 49, we got 48
         successors = []
         for action in self.actions:
             if action.all_preconds_in_list(state) and not action.is_noop():  # todo: validate noop
@@ -153,7 +152,6 @@ def level_sum(state, planning_problem):
         prop_layer_init.add_proposition(prop)  # update the proposition layer with the propositions of the state
     pg_init = PlanGraphLevel()  # create a new plan graph level (level is the action layer and the propositions layer)
     pg_init.set_proposition_layer(prop_layer_init)  # update the new plan graph level with the the proposition layer`
-    # todo: expected (allegedly): ??, we got 23 (although consistently)
     level = 0
     graph: List[PlanGraphLevel] = [pg_init]
     first_appearances = dict()
