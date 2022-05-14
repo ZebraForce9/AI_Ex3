@@ -1,3 +1,4 @@
+from itertools import product  # todo
 from typing import Set, Dict, Iterable, List, Tuple
 
 from action_layer import ActionLayer
@@ -64,7 +65,7 @@ class PlanGraphLevel(object):
         for action in all_actions:
             if not previous_proposition_layer.all_preconds_in_layer(action):
                 continue
-            proposition_pairs: List[Tuple] = unique_product(action.get_pre(), action.get_pre())
+            proposition_pairs = product(action.get_pre(), action.get_pre())
             if all(not previous_proposition_layer.is_mutex(p1, p2) for p1, p2 in proposition_pairs):
                 self.action_layer.add_action(action)
 
@@ -79,7 +80,7 @@ class PlanGraphLevel(object):
         Note that an action is *not* mutex with itself
         """
         current_layer_actions = sorted(list(self.action_layer.get_actions()))
-        action_pairs: List[Tuple] = unique_product(current_layer_actions, current_layer_actions)
+        action_pairs = product(current_layer_actions, current_layer_actions)
         for a1, a2 in action_pairs:
             if mutex_actions(a1, a2, previous_layer_mutex_proposition):
                 self.action_layer.add_mutex_actions(a1, a2)
@@ -120,7 +121,7 @@ class PlanGraphLevel(object):
         """
         current_layer_propositions = sorted(list(self.proposition_layer.get_propositions()))
         current_layer_mutex_actions: Set[Pair] = self.action_layer.get_mutex_actions()
-        proposition_pairs: List[Tuple] = unique_product(current_layer_propositions, current_layer_propositions)
+        proposition_pairs = product(current_layer_propositions, current_layer_propositions)
         for p1, p2 in proposition_pairs:
             if mutex_propositions(p1, p2, current_layer_mutex_actions):
                 self.proposition_layer.add_mutex_prop(p1, p2)
@@ -158,6 +159,9 @@ def mutex_actions(a1: Action, a2: Action, mutex_props: Set[Pair]) -> bool:
     this is the list of all the independent pair of actions (according to your implementation in question 1).
     If not, we check whether a1 and a2 have competing needs
     """
+    if a1 == a2:
+        return False
+
     if Pair(a1, a2) not in PlanGraphLevel.independent_actions:
         return True
     return have_competing_needs(a1, a2, mutex_props)
@@ -170,7 +174,7 @@ def have_competing_needs(a1: Action, a2: Action, mutex_props: Set[Pair]) -> bool
     Hint: for propositions p  and q, the command  "Pair(p, q) in mutex_props"
           returns true if p and q are mutex in the previous level
     """
-    proposition_pairs: List[Tuple] = unique_product(a1.get_pre(), a2.get_pre())
+    proposition_pairs = product(a1.get_pre(), a2.get_pre())
     return any(Pair(p, q) in mutex_props for p, q in proposition_pairs)
 
 
@@ -183,9 +187,8 @@ def mutex_propositions(prop1: Proposition, prop2: Proposition, mutex_actions_lis
     prop1.get_producers() returns the set of all the possible actions in the layer that have prop1 on their add list
     """
     # todo: add the 1st condition
-    actions_pairs: List[Tuple] = unique_product(prop1.get_producers(), prop2.get_producers())
+    actions_pairs = product(prop1.get_producers(), prop2.get_producers())  # todo: changed unique to regular product
     return all(Pair(a1, a2) in mutex_actions_list for a1, a2 in actions_pairs)
 
-
-def unique_product(iter1: Iterable, iter2: Iterable) -> List[Tuple]:
-    return sorted([(a, b) for a in iter1 for b in iter2 if a != b])
+# def product(iter1: Iterable, iter2: Iterable) -> List[Tuple]:
+#     return sorted([(a, b) for a in iter1 for b in iter2 if a != b])

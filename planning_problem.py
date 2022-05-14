@@ -1,5 +1,5 @@
 from graph_plan import GraphPlan
-from plan_graph_level import PlanGraphLevel, unique_product
+from plan_graph_level import PlanGraphLevel, product
 from pgparser import PgParser
 from action import Action
 from proposition import Proposition
@@ -69,25 +69,8 @@ class PlanningProblem:
             if action.all_preconds_in_list(state) and not action.is_noop():  # todo: validate noop
                 successor = frozenset(action.get_add() + [prop for prop in state if prop not in action.get_delete()])
                 successors.append((successor, action, step_cost))
-                # proposition_pairs = unique_product(action.get_pre(), action.get_pre())
-                # if all(not state.is_mutex(p, q) for p, q in proposition_pairs):
-                #     self.action_layer.add_action(action)
 
         return successors
-
-        # current_level = PlanGraphLevel()
-        # current_prop_layer = PropositionLayer()
-        # for p in state:
-        #     current_prop_layer.add_proposition(p)
-        # current_level.update_action_layer(current_prop_layer)
-        # successors = []
-        # # todo: can noOp be in an optimal plan?
-        # #  also, do we *have* to use PlanGraphLevel?
-        # for action in current_level.get_action_layer().get_actions():
-        #     successor = frozenset(action.get_add() + [prop for prop in state if prop not in action.get_delete()])
-        #     successors.append((successor, action, step_cost))
-        #
-        # return successors
 
     @staticmethod
     def get_cost_of_actions(actions):
