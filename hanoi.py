@@ -59,7 +59,7 @@ def create_problem_file(problem_file_name_, n_, m_):
 
     for d in disks:
         for p in pegs:
-            problem_file.write(f"SMALLER({d}, {p}) ")
+            problem_file.write(f"SMALLER({d}-{p}) ")
 
     problem_file.write("\n")
     # Goal State
@@ -68,10 +68,10 @@ def create_problem_file(problem_file_name_, n_, m_):
         problem_file.write(f"CLEAR({pegs[i]}) ")
 
     problem_file.write(f"CLEAR({disks[0]}) ")
-    problem_file.write(f"ON({disks[-1]}, {pegs[-1]}) ")
+    problem_file.write(f"ON({disks[-1]}-{pegs[-1]}) ")
 
     for i in range(1, len(disks)):
-        problem_file.write(f"ON({disks[i - 1]}, {disks[i]}) ")
+        problem_file.write(f"ON({disks[i - 1]}-{disks[i]}) ")
 
     problem_file.close()
 
