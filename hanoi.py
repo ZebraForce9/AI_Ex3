@@ -15,15 +15,16 @@ def create_domain_file(domain_file_name, n_, m_):
     for d in disks:
         domain_file.write(f"CLEAR({d}) ")
 
-    for i, d1 in enumerate(disks):
-        for d2 in disks[i + 1:]:
-            domain_file.write(f"{d1}SMALLER{d2}")
-            domain_file.write(f"{d1}ON{d2}")
+    for i in range(1, len(disks)):
+        domain_file.write(f"SMALLER({disks[i - 1]}, {disks[i]}) ")
+        domain_file.write(f"ON({disks[i - 1]}, {disks[i]}) ")
+
+    domain_file.write(f"\n")
 
     for d in disks:
         for a in disks + pegs:
             for b in disks + pegs:
-                if (a[0] == "d" and d >= a) or (b[0] == "d" and d >= b):
+                if (a[0] == "d" and d >= a) or (b[0] == "d" and d >= b) or (a == b):
                     continue
                 domain_file.write(f"Name: Move({d}, {a}, {b})\n")
                 domain_file.write(f"Pre: CLEAR({d}) ON({d}, {a}) CLEAR({b}) SMALLER({a}, {b})\n")
