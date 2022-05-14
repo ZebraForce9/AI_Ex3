@@ -129,20 +129,21 @@ def max_level(state: FrozenSet[Proposition], planning_problem: PlanningProblem) 
         prop_layer_init.add_proposition(prop)  # update the proposition layer with the propositions of the state
     pg_init = PlanGraphLevel()  # create a new plan graph level (level is the action layer and the propositions layer)
     pg_init.set_proposition_layer(prop_layer_init)  # update the new plan graph level with the the proposition layer`
-    # todo: expected (allegedly): 29, we got 23 (although consistently)
     level = 0
     graph: List[PlanGraphLevel] = [pg_init]
-    while not planning_problem.is_goal_state(state):
+    current_state = frozenset(pg_init.get_proposition_layer().get_propositions())
+    while not planning_problem.is_goal_state(current_state):
         if is_fixed(graph, level):
             return float('inf')
         level += 1
         pg_next = PlanGraphLevel()
         pg_next.expand_without_mutex(graph[level - 1])
         graph.append(pg_next)
+        current_state = frozenset(pg_next.get_proposition_layer().get_propositions())
     return level
 
 
-def level_sum(state, planning_problem):
+def level_sum(state: FrozenSet[Proposition], planning_problem: PlanningProblem) -> float:
     """
     The heuristic value is the sum of sub-goals level they first appeared.
     If the goal is not reachable from the state your heuristic should return float('inf')
@@ -154,20 +155,28 @@ def level_sum(state, planning_problem):
     pg_init.set_proposition_layer(prop_layer_init)  # update the new plan graph level with the the proposition layer`
     level = 0
     graph: List[PlanGraphLevel] = [pg_init]
-    first_appearances = dict()
 
-    while not planning_problem.is_goal_state(state):
+    current_state = set(pg_init.get_proposition_layer().get_propositions())
+    levels_sum = 0
+
+    remaining_sub_goals = set(planning_problem.goal) - current_state
+    while not planning_problem.is_goal_state(current_state):
+        pg_next = PlanGraphLevel()
+        pg_next.expand_without_mutex(graph[level])
+        graph.append(pg_next)
+        level += 1
+
         if is_fixed(graph, level):
             return float('inf')
-        for prop in planning_problem.goal:
-            current_props = graph[level].get_proposition_layer().get_propositions()
-            if prop not in first_appearances and prop in current_props:
-                first_appearances[prop] = level
-        level += 1
-        pg_next = PlanGraphLevel()
-        pg_next.expand_without_mutex(graph[level - 1])
-        graph.append(pg_next)
-    return sum(first_appearances.values())
+
+        current_state = frozenset(pg_next.get_proposition_layer().get_propositions())
+        for prop in remaining_sub_goals:
+            if prop in current_state:
+                levels_sum += level
+
+        remaining_sub_goals -= current_state
+
+    return levels_sum
 
 
 def is_fixed(graph, level):
