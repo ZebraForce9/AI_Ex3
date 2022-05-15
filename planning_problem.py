@@ -2,6 +2,7 @@ from graph_plan import GraphPlan
 from plan_graph_level import PlanGraphLevel, product
 from pgparser import PgParser
 from action import Action
+from proposition_layer import PropositionLayer
 from proposition import Proposition
 from typing import FrozenSet, List, Tuple
 
@@ -16,7 +17,6 @@ except:
 #     from CPF.search_win_34 import SearchProblem
 #     from CPF.search_win_34 import a_star_search
 from proposition_layer import PropositionLayer
-
 
 class PlanningProblem:
     def __init__(self, domain_file, problem_file):
@@ -66,7 +66,7 @@ class PlanningProblem:
         step_cost = 1
         successors = []
         for action in self.actions:
-            if action.all_preconds_in_list(state) and not action.is_noop():  # todo: validate noop
+            if action.all_preconds_in_list(state) and not action.is_noop():
                 successor = frozenset(action.get_add() + [prop for prop in state if prop not in action.get_delete()])
                 successors.append((successor, action, step_cost))
 

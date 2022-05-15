@@ -61,7 +61,7 @@ class PlanGraphLevel(object):
         if all the preconditions of action are in the previous propositions layer
         self.actionLayer.addAction(action) adds action to the current action layer
         """
-        all_actions = sorted(PlanGraphLevel.actions)
+        all_actions = PlanGraphLevel.actions
         for action in all_actions:
             if not previous_proposition_layer.all_preconds_in_layer(action):
                 continue
@@ -79,7 +79,7 @@ class PlanGraphLevel(object):
         adds the pair (action1, action2) to the mutex set in the current action layer
         Note that an action is *not* mutex with itself
         """
-        current_layer_actions = sorted(list(self.action_layer.get_actions()))
+        current_layer_actions = self.action_layer.get_actions()
         action_pairs = product(current_layer_actions, current_layer_actions)
         for a1, a2 in action_pairs:
             if mutex_actions(a1, a2, previous_layer_mutex_proposition):
@@ -98,10 +98,10 @@ class PlanGraphLevel(object):
                already added to the layer
         self.proposition_layer.add_proposition(prop) adds the proposition prop to the current layer
         """
-        current_layer_actions = sorted(list(self.action_layer.get_actions()))
+        current_layer_actions = self.action_layer.get_actions()
         propositions: Dict[str: Proposition] = dict()  # Prop_Name: Prop
         for action in current_layer_actions:
-            for prop in sorted(list(action.get_add())):
+            for prop in action.get_add():
                 name = prop.get_name()
                 if name not in propositions:
                     propositions[name] = Proposition(name)
@@ -119,7 +119,7 @@ class PlanGraphLevel(object):
         self.proposition_layer.add_mutex_prop(prop1, prop2) adds the pair (prop1, prop2)
         to the mutex set of the current layer
         """
-        current_layer_propositions = sorted(list(self.proposition_layer.get_propositions()))
+        current_layer_propositions = self.proposition_layer.get_propositions()
         current_layer_mutex_actions: Set[Pair] = self.action_layer.get_mutex_actions()
         proposition_pairs = product(current_layer_propositions, current_layer_propositions)
         for p1, p2 in proposition_pairs:
@@ -189,6 +189,3 @@ def mutex_propositions(prop1: Proposition, prop2: Proposition, mutex_actions_lis
     # todo: add the 1st condition
     actions_pairs = product(prop1.get_producers(), prop2.get_producers())  # todo: changed unique to regular product
     return all(Pair(a1, a2) in mutex_actions_list for a1, a2 in actions_pairs)
-
-# def product(iter1: Iterable, iter2: Iterable) -> List[Tuple]:
-#     return sorted([(a, b) for a in iter1 for b in iter2 if a != b])
