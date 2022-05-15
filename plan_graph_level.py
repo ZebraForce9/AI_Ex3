@@ -1,5 +1,5 @@
-from itertools import product  # todo
-from typing import Set, Dict, Iterable, List, Tuple
+from itertools import product
+from typing import Set, Dict
 
 from action_layer import ActionLayer
 from action import Action
@@ -186,6 +186,5 @@ def mutex_propositions(prop1: Proposition, prop2: Proposition, mutex_actions_lis
     You might want to use this function:
     prop1.get_producers() returns the set of all the possible actions in the layer that have prop1 on their add list
     """
-    # todo: add the 1st condition
-    actions_pairs = product(prop1.get_producers(), prop2.get_producers())  # todo: changed unique to regular product
+    actions_pairs = product(prop1.get_producers(), prop2.get_producers())
     return all(Pair(a1, a2) in mutex_actions_list for a1, a2 in actions_pairs)

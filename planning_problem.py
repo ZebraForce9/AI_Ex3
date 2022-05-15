@@ -1,5 +1,4 @@
-from graph_plan import GraphPlan
-from plan_graph_level import PlanGraphLevel, product
+from plan_graph_level import PlanGraphLevel
 from pgparser import PgParser
 from action import Action
 from proposition_layer import PropositionLayer
@@ -7,16 +6,17 @@ from proposition import Proposition
 from typing import FrozenSet, List, Tuple
 
 try:
-    from CPF.search import SearchProblem
-    from CPF.search import a_star_search
+    from search import SearchProblem
+    from search import a_star_search
 
 except:
-    from CPF.search import SearchProblem
-    from CPF.search import a_star_search
-# except:
-#     from CPF.search_win_34 import SearchProblem
-#     from CPF.search_win_34 import a_star_search
-from proposition_layer import PropositionLayer
+    try:
+        from CPF.search import SearchProblem
+        from CPF.search import a_star_search
+    except:
+        from CPF.search_win_34 import SearchProblem
+        from CPF.search_win_34 import a_star_search
+
 
 class PlanningProblem:
     def __init__(self, domain_file, problem_file):
@@ -47,7 +47,7 @@ class PlanningProblem:
         """
         Hint: you might want to take a look at goal_state_not_in_prop_layer function
         """
-        return not self.goal_state_not_in_prop_layer(state)  # todo: validate
+        return not self.goal_state_not_in_prop_layer(state)
 
     def get_successors(self, state: FrozenSet[Proposition]) -> List[Tuple[FrozenSet[Proposition], Action, int]]:
         """
@@ -201,9 +201,9 @@ if __name__ == '__main__':
             exit()
 
     prob = PlanningProblem(domain, problem)
-    start = time.time()  # todo: changed clock to time
+    start = time.time()
     plan = a_star_search(prob, heuristic)
-    elapsed = time.time() - start  # todo: changed clock to time
+    elapsed = time.time() - start
     if plan is not None:
         print("Plan found with %d actions in %.2f seconds" % (len(plan), elapsed))
     else:

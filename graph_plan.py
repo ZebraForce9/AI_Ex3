@@ -257,11 +257,10 @@ if __name__ == '__main__':
         problem = str(sys.argv[2])
 
     gp = GraphPlan(domain, problem)
-    start = time.time()  # todo: was clock()
+    start = time.time()
     plan = gp.graph_plan()
-    elapsed = time.time() - start  # todo: was clock()
+    elapsed = time.time() - start
     if plan is not None:
         print("Plan found with %d actions in %.2f seconds" % (len([act for act in plan if not act.is_noop()]), elapsed))
     else:
         print("Could not find a plan in %.2f seconds" % elapsed)
-    print([action.name for action in plan])

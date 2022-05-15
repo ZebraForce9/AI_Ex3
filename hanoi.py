@@ -31,7 +31,6 @@ def create_domain_file(domain_file_name, n_, m_):
                 domain_file.write(f"Pre: CLEAR({d}) ON({d}-{a}) CLEAR({b}) SMALLER({d}-{b})\n")
                 domain_file.write(f"Add: CLEAR({a}) ON({d}-{b})\n")
                 domain_file.write(f"Del: ON({d}-{a}) CLEAR({b})\n")
-                # domain_file.write("\n")  # TODO: REMOVE
 
     domain_file.close()
 
